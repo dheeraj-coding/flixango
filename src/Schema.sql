@@ -22,10 +22,10 @@ end;
 CREATE TABLE users
 (
     ID       INTEGER NOT NULL,
-    Name     VARCHAR(10),
-    Email    VARCHAR(10),
-    Phone    Number(10),
-    Password VARCHAR(10),
+    Name     VARCHAR(100),
+    Email    VARCHAR(100),
+    Phone    INTEGER,
+    Password VARCHAR(100),
     CONSTRAINT PK_Users PRIMARY KEY (ID)
 );
 

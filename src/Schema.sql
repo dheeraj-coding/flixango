@@ -44,13 +44,14 @@ end;
 CREATE TABLE reviews
 (
     RID        INTEGER NOT NULL,
-    UserID     NUMBER,
-    UMID       NUMBER,
+    UserID     INTEGER,
+    UMID       INTEGER,
     Review     VARCHAR(1000),
     Upvote     NUMBER,
     created_at TIMESTAMP,
     CONSTRAINT PK_Reviews PRIMARY KEY (RID, UserID, UMID),
-    CONSTRAINT FK_Reviewer FOREIGN KEY (UserID) REFERENCES users (ID)
+    CONSTRAINT FK_Reviewer FOREIGN KEY (UserID) REFERENCES users (ID),
+    CONSTRAINT FK_ReviewMovie FOREIGN KEY (UMID) REFERENCES movies (UMID)
 );
 
 CREATE SEQUENCE reviews_sequence;

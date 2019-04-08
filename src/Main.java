@@ -12,12 +12,9 @@ public class Main {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "root");
-            Movie m = Movie.create(con, "7even", "English", "2hrs", 4.5, 2);
-            User u = User.create(con, "McDhee", "dheeraj.98@outlook.com", 9880488339L, "roast");
-            Review r = Review.create(con, "Awesome movie", 2, u, m);
-            r.Review = "Not so great movie";
-            r.save();
-            System.out.println(r);
+
+            User u = User.findByEMail(con, "pranav.2@gmail.com");
+            System.out.println(u);
             con.close();
         } catch (Exception e) {
             System.out.println("Exception:" + e);

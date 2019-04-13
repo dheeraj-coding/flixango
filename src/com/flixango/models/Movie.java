@@ -4,16 +4,19 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class Movie {
-    int UMID;
-    String Name;
-    String Language;
-    String Duration;
-    double Rating;
-    int CCode;
+    public int UMID;
+    public String Name;
+    public String Language;
+    public String Duration;
+    public double Rating;
+    public int CCode;
+    public ArrayList<Genre> genres;
+    public ArrayList<Review> reviews;
     Connection con;
 
     public Movie() {
-
+        this.genres = new ArrayList<>();
+        this.reviews = new ArrayList<>();
     }
 
     public Movie(Connection con, String Name, String Language, String Duration, double Rating, int CCode) {
@@ -23,12 +26,10 @@ public class Movie {
         this.Duration = Duration;
         this.Rating = Rating;
         this.CCode = CCode;
+        this.genres = new ArrayList<>();
+        this.reviews = new ArrayList<>();
     }
 
-    public String toString() {
-        String str = String.format("Name: %s, Language: %s, Duration: %s, Rating:%f, CCode: %d", this.Name, this.Language, this.Duration, this.Rating, this.CCode);
-        return str;
-    }
 
     public Movie(Connection con, int UMID, String Name, String Language, String Duration, double Rating, int CCode) {
         this.con = con;
@@ -38,6 +39,13 @@ public class Movie {
         this.Duration = Duration;
         this.Rating = Rating;
         this.CCode = CCode;
+        this.genres = new ArrayList<>();
+        this.reviews = new ArrayList<>();
+    }
+
+    public String toString() {
+        String str = String.format("Name: %s, Language: %s, Duration: %s, Rating:%f, CCode: %d", this.Name, this.Language, this.Duration, this.Rating, this.CCode);
+        return str;
     }
 
     public boolean save() {
@@ -128,5 +136,39 @@ public class Movie {
             System.out.println("Exception Finding movies by name:" + e);
         }
         return m;
+    }
+
+    public ArrayList<Genre> getGenres() {
+        try {
+            String query = "SELECT GID, Name FROM TABLE(get_genre_for_movie(?))";
+            PreparedStatement stmnt = this.con.prepareStatement(query);
+            stmnt.setInt(1, this.UMID);
+            ResultSet rs = stmnt.executeQuery();
+            while (rs.next()) {
+                Genre g = new Genre(con, rs.getInt(1), rs.getString(2));
+                this.genres.add(g);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception getting genres for movie:" + e);
+        }
+        return this.genres;
+    }
+
+    public ArrayList<Review> getReviews() {
+        try {
+            String query = "SELECT RID, USERID, UMID, Review, Upvote, created_at FROM TABLE(get_reviews_for_movie(?))";
+            PreparedStatement stmnt = this.con.prepareStatement(query);
+            stmnt.setInt(1, this.UMID);
+            ResultSet rs = stmnt.executeQuery();
+            while (rs.next()) {
+                Review r = new Review(con, rs.getInt(1), rs.getInt(2), rs.getInt(3),
+                        rs.getString(4), rs.getDouble(5), rs.getTimestamp(6));
+                r.movie = this;
+                this.reviews.add(r);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception retrieving reviews for movie: " + e);
+        }
+        return this.reviews;
     }
 }

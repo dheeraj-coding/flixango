@@ -25,6 +25,11 @@ public class Genre {
         this.Name = Name;
     }
 
+    public String toString() {
+        String str = String.format("Name: %s", this.Name);
+        return str;
+    }
+
     public static Genre create(Connection con, String name) {
         Genre g = null;
         try {

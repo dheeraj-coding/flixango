@@ -171,4 +171,24 @@ public class Movie {
         }
         return this.reviews;
     }
+
+    public boolean addGenre(Genre g) {
+        boolean status = false;
+        try {
+            String query = "INSERT INTO genre_type (GID, UMID) VALUES(?, ?)";
+            PreparedStatement stmnt = this.con.prepareStatement(query);
+            stmnt.setInt(1, g.GID);
+            stmnt.setInt(2, this.UMID);
+            int num = stmnt.executeUpdate();
+            if (num > 0) {
+                status = true;
+                this.genres.add(g);
+            }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("Genre already exists for this movie");
+        } catch (Exception e) {
+            System.out.println("Exception adding genre to movie: " + e);
+        }
+        return status;
+    }
 }

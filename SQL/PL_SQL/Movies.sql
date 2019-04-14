@@ -32,3 +32,24 @@ BEGIN
         end loop;
 end;
 /
+
+CREATE OR REPLACE FUNCTION get_cast_for_movie(MovieID movies.UMID%TYPE) RETURN cast_table PIPELINED AS
+    CURSOR c IS SELECT M.mid   AS MID,
+                       M.name  AS Name,
+                       M.bio   AS BIO,
+                       M.bdate AS bdate,
+                       R.Name  AS Role
+                FROM Members M,
+                     Cast C,
+                     Roles R
+                WHERE C.mid = M.mid
+                  and C.UMID = MovieID
+                  and C.roleID = R.ID;
+BEGIN
+    FOR each in c
+        LOOP
+            DBMS_OUTPUT.PUT_LINE(each.Name);
+            PIPE ROW ( cast_object(each.MID, each.Name, each.BIO, each.bdate, each.Role) );
+        end loop;
+end;
+/

@@ -21,3 +21,16 @@ CREATE OR REPLACE TYPE review_object as OBJECT
 
 CREATE OR REPLACE TYPE review_table AS TABLE OF review_object;
 /
+
+CREATE OR REPLACE TYPE cast_object as OBJECT
+(
+    mid   INTEGER,
+    name  VARCHAR(20),
+    bio   VARCHAR(500),
+    bdate DATE,
+    role  VARCHAR(20)
+)
+/
+
+CREATE OR REPLACE TYPE cast_table AS TABLE OF cast_object;
+/

@@ -2,6 +2,7 @@ package com.flixango.models;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Movie {
     public int UMID;
@@ -12,11 +13,15 @@ public class Movie {
     public int CCode;
     public ArrayList<Genre> genres;
     public ArrayList<Review> reviews;
+    public ArrayList<Member> members;
+    public HashMap<String, Member> cast;
     Connection con;
 
     public Movie() {
         this.genres = new ArrayList<>();
         this.reviews = new ArrayList<>();
+        this.members = new ArrayList<>();
+        this.cast = new HashMap<>();
     }
 
     public Movie(Connection con, String Name, String Language, String Duration, double Rating, int CCode) {
@@ -28,6 +33,8 @@ public class Movie {
         this.CCode = CCode;
         this.genres = new ArrayList<>();
         this.reviews = new ArrayList<>();
+        this.members = new ArrayList<>();
+        this.cast = new HashMap<>();
     }
 
 
@@ -41,6 +48,8 @@ public class Movie {
         this.CCode = CCode;
         this.genres = new ArrayList<>();
         this.reviews = new ArrayList<>();
+        this.members = new ArrayList<>();
+        this.cast = new HashMap<>();
     }
 
     public String toString() {
@@ -161,7 +170,7 @@ public class Movie {
             stmnt.setInt(1, this.UMID);
             ResultSet rs = stmnt.executeQuery();
             while (rs.next()) {
-                Review r = new Review(con, rs.getInt(1), rs.getInt(2), rs.getInt(3),
+                Review r = new Review(this.con, rs.getInt(1), rs.getInt(2), rs.getInt(3),
                         rs.getString(4), rs.getDouble(5), rs.getTimestamp(6));
                 r.movie = this;
                 this.reviews.add(r);
@@ -188,6 +197,43 @@ public class Movie {
             System.out.println("Genre already exists for this movie");
         } catch (Exception e) {
             System.out.println("Exception adding genre to movie: " + e);
+        }
+        return status;
+    }
+
+    public HashMap<String, Member> getCast() {
+        try {
+            String query = "SELECT MID, Name, Bio, BDate, Role FROM TABLE(get_cast_for_movie(?))";
+            PreparedStatement stmnt = this.con.prepareStatement(query);
+            stmnt.setInt(1, this.UMID);
+            ResultSet rs = stmnt.executeQuery();
+            while (rs.next()) {
+                Member m = new Member(this.con, rs.getInt(1), rs.getString(2), rs.getString(3), rs.getDate(4));
+                this.members.add(m);
+                this.cast.put(rs.getString(5), m);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception getting cast for movie:" + e);
+        }
+        return this.cast;
+    }
+
+    public boolean addCast(Member m, Role r) {
+        boolean status = false;
+        try {
+            String query = "INSERT INTO cast (UMID, MID, roleID) VALUES(?, ?, ?)";
+            PreparedStatement stmnt = this.con.prepareStatement(query);
+            stmnt.setInt(1, this.UMID);
+            stmnt.setInt(2, m.MID);
+            stmnt.setInt(3, r.ID);
+            int num = stmnt.executeUpdate();
+            if (num > 0) {
+                status = true;
+                this.members.add(m);
+                this.cast.put(r.Name, m);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception adding cast member" + e);
         }
         return status;
     }

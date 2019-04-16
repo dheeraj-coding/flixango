@@ -63,7 +63,7 @@ public class Genre {
         } catch (Exception e) {
             System.out.println("Exception saving genre:" + e);
         }
-        return true;
+        return status;
     }
 
     public static Genre findOneByID(Connection con, int GID) {

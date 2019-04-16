@@ -9,10 +9,11 @@ public class User {
     public String EMail;
     public Long Phone;
     public String Password;
+    ArrayList<WatchList> watchLists;
     Connection con;
 
     public User() {
-
+        this.watchLists = new ArrayList<>();
     }
 
     public User(Connection con, int ID, String Name, String EMail, Long Phone, String Password) {
@@ -22,6 +23,7 @@ public class User {
         this.EMail = EMail;
         this.Phone = Phone;
         this.Password = Password;
+        this.watchLists = new ArrayList<>();
     }
 
     public User(Connection con, String Name, String Email, Long Phone, String Password) {
@@ -30,6 +32,7 @@ public class User {
         this.EMail = Email;
         this.Phone = Phone;
         this.Password = Password;
+        this.watchLists = new ArrayList<>();
     }
 
     @Override
@@ -127,5 +130,21 @@ public class User {
             System.out.println("Exception Finding user by ID:" + e);
         }
         return u;
+    }
+
+    public ArrayList<WatchList> getWatchLists() {
+        try {
+            String query = "SELECT WID, CreatorID, Name, created_at FROM TABLE(get_watchlist_for_user(?))";
+            PreparedStatement stmnt = this.con.prepareStatement(query);
+            stmnt.setInt(1, this.ID);
+            ResultSet rs = stmnt.executeQuery();
+            while (rs.next()) {
+                WatchList w = new WatchList(this.con, rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getTimestamp(4));
+                this.watchLists.add(w);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception getting watchlist for user:" + e);
+        }
+        return this.watchLists;
     }
 }

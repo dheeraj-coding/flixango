@@ -48,7 +48,6 @@ CREATE OR REPLACE FUNCTION get_cast_for_movie(MovieID movies.UMID%TYPE) RETURN c
 BEGIN
     FOR each in c
         LOOP
-            DBMS_OUTPUT.PUT_LINE(each.Name);
             PIPE ROW ( cast_object(each.MID, each.Name, each.BIO, each.bdate, each.Role) );
         end loop;
 end;

@@ -71,7 +71,7 @@ end;
 CREATE TABLE watchlist
 (
     WID        INTEGER NOT NULL,
-    CreatorID  NUMBER,
+    CreatorID  INTEGER,
     Name       VARCHAR(10),
     Created_at TIMESTAMP,
     CONSTRAINT PK_watchlist PRIMARY KEY (WID),
